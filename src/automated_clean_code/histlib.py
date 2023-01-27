@@ -4,44 +4,80 @@
 import argparse
 
 
-def main():
-    """Multiply two numbers together.
-
-    Args:
-      x (int): a number
-      y (int): a number
-
-    Returns:
-      (int). The product of the two numbers.
-    """
+# method to get args
+def get_args() -> argparse.Namespace:
+    """Get args."""
     parser = argparse.ArgumentParser(
         description="compute the entry with the most occurrence and the least occurrence form a file"
     )
     parser.add_argument("fname", metavar="N", type=str, help="filename to compute the histogram")
-    args = parser.parse_args()
-    counter = {}
-    max_key = None
-    max_counter = 0
-    min_key = None
-    min_counter = 0
+    return parser.parse_args()
 
-    # fill up histogram
-    with open(args.fname, "r") as f:
+
+def create_counter_hist(fname: str) -> dict:
+    """Create counter histogram.
+
+    Args:
+        fname (str): filename
+
+    Returns:
+        dict: counter histogram
+    """
+    counter = {}
+    with open(fname, "r") as f:
         for line in f:
             line = line.strip()
             if line in counter:
                 counter[line] += 1
             else:
                 counter[line] = 0
+    return counter
 
-    # find max key
+
+def find_min_counter(counter: dict) -> tuple:
+    """Find min key and min counter.
+
+    Args:
+        counter (dict): counter histogram
+
+    Returns:
+        tuple: min key and min counter
+    """
+    min_key = None
+    min_counter = 0
+    for k, v in counter.items():
+        if min_key is None or v < min_counter:
+            min_key = k
+            min_counter = v
+    return min_key, min_counter
+
+
+def find_max_counter(counter: dict) -> tuple:
+    """Find max key and max counter.
+
+    Args:
+        counter (dict): counter histogram
+
+    Returns:
+        tuple: max key and max counter
+    """
+    max_key = None
+    max_counter = 0
     for k, v in counter.items():
         if max_key is None or v > max_counter:
             max_key = k
             max_counter = v
-        if min_key is None or v < min_counter:
-            min_key = k
-            min_counter = v
+    return max_key, max_counter
+
+
+def main():
+    """Find min and max with counter."""
+    args = get_args()
+
+    counter_hist = create_counter_hist(args.fname)
+
+    min_key, min_counter = find_min_counter(counter_hist)
+    max_key, max_counter = find_max_counter(counter_hist)
 
     print(f"Min Key = {min_key} with count = {min_counter}")
     print(f"Max Key = {max_key} with count = {max_counter}")
