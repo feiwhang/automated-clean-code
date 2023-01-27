@@ -14,23 +14,23 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def create_counter_hist(fname: str) -> dict:
+def create_counter_hist(lines: list[str]) -> dict:
     """Create counter histogram.
 
     Args:
-        fname (str): filename
+        lines (list[str]): line by line list
 
     Returns:
         dict: counter histogram
     """
     counter = {}
-    with open(fname, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line in counter:
-                counter[line] += 1
-            else:
-                counter[line] = 0
+
+    for line in lines:
+        line = line.strip()
+        if line in counter:
+            counter[line] += 1
+        else:
+            counter[line] = 1
     return counter
 
 
@@ -73,11 +73,16 @@ def find_max_counter(counter: dict) -> tuple:
 def main():
     """Find min and max with counter."""
     args = get_args()
+    lines = []
 
-    counter_hist = create_counter_hist(args.fname)
+    with open(args.fname, "r") as f:
+        for line in f:
+            lines.append(line)
 
-    min_key, min_counter = find_min_counter(counter_hist)
-    max_key, max_counter = find_max_counter(counter_hist)
+    counter = create_counter_hist(lines)
+
+    min_key, min_counter = find_min_counter(counter)
+    max_key, max_counter = find_max_counter(counter)
 
     print(f"Min Key = {min_key} with count = {min_counter}")
     print(f"Max Key = {max_key} with count = {max_counter}")
